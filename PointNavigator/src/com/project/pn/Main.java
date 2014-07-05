@@ -29,7 +29,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 	private GoogleMap googleMap = null;
 
 	// マーカーと駅情報のHashMap
-	private HashMap<Marker, EkiInfo> ekiMarkerMap;
+	private HashMap<Marker, StoreInfo> pointMarkerMap;
 
 	// 地図の中心位置
 	private CameraPosition centerPosition = null;
@@ -39,7 +39,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		ekiMarkerMap = new HashMap<Marker, EkiInfo>();
+		pointMarkerMap = new HashMap<Marker, StoreInfo>();
 
 		// MapFragmentを取得する(2)
 		MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -65,12 +65,10 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 							public void onInfoWindowClick(Marker marker) {
 
 								// 駅情報の取り出し
-								EkiInfo e = ekiMarkerMap.get(marker);
+								StoreInfo e = pointMarkerMap.get(marker);
 
 								Toast ts = Toast.makeText(getBaseContext(), 
-										e.name + "(" + e.distance + "m)\n"
-										+ "前の駅:" + e.prev + "\n次の駅:" + e.next + "\n"
-										+ e.line, Toast.LENGTH_LONG);
+										e.name + "(" + e.pointNames + "m)\n" , Toast.LENGTH_LONG);
 								ts.setGravity(Gravity.TOP, 0, 200);
 								ts.show();
 
@@ -193,25 +191,25 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 		case 0:
 
 			// APIの結果を解析する
-			ParseMoyori parse = new ParseMoyori();
+			ParseStoreInfo parse = new ParseStoreInfo();
 			parse.loadJson(body);
 
 			// マーカーをいったん削除しておく
 			googleMap.clear();
-			ekiMarkerMap.clear();
+			pointMarkerMap.clear();
 			
 			// APIの結果をマーカーに反映する（2）
-			for (EkiInfo e : parse.getEkiinfo()) {
+			for (StoreInfo e : parse.getStoreInfo()) {
 
 				Marker marker = googleMap.addMarker(new MarkerOptions()
 						.position(new LatLng(e.y, e.x))
 						.title(e.name)
-						.snippet(e.line)
+						.snippet(e.pointNames)
 						.icon(BitmapDescriptorFactory
-								.fromResource(R.drawable.ic_train))); //(3)
+								.fromResource(R.drawable.ic_pin))); //(3)
 
 				// マーカーと駅情報を保管しておく（4）
-				ekiMarkerMap.put(marker, e);
+				pointMarkerMap.put(marker, e);
 			}
 			break;
 		}
