@@ -25,6 +25,14 @@ import com.project.util.HttpAsyncLoader;
 
 public class Main extends Activity implements LoaderCallbacks<String> {
 
+	//TODO　１−１メニュー画面より、利用しているポイントを選択できるようにする
+	//TODO　１−２選択されたポイントのみを表示するようにする
+	//TODO 　２−１　メニュー画面より、ポイントカードの追加。「ポイントカード名（必須）選択式」、「利用可能店舗名（必須）」、「ジャンル（必須）選択式」、「住所（必須）」、「電話番号」、「Webサイト」、
+	//TODO   ２−２ トーストから電話起動、ブラウザ起動を行う
+	//TODO　　２−３　ポイントカードは、Ponta , nanaco TPoint など有名どころ以外は　「オリジナル」という言葉で
+	//TODO AD 表示部分確保
+	//TODO 地図検索（最寄り駅、住所）
+	
 	// マップオブジェクト（1）
 	private GoogleMap googleMap = null;
 
@@ -210,6 +218,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 
 				// マーカーと駅情報を保管しておく（4）
 				pointMarkerMap.put(marker, e);
+				//LocalDBにも格納
 			}
 			break;
 		}
