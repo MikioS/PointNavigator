@@ -181,7 +181,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 
 	@Override
 	public void onLoadFinished(Loader<String> loader, String body) {
-
+		body = "{\"response\":{\"store\":[{\"x\":139.766709,\"y\":35.681247,\"pointNames\":\"Ponta\",\"name\":\"ローソン上野店\"}]}}";
 		// APIの取得に失敗の場合
 		if (body == null)
 			return;

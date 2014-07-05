@@ -23,7 +23,7 @@ public class ParseStoreInfo extends ParseJson {
 		if (root != null){
 
 			// 最寄駅のイテレータを取得する（1）
-			Iterator<JsonNode> ite = root.path("response").path("station").elements();
+			Iterator<JsonNode> ite = root.path("response").path("store").elements();
 			// 要素の取り出し（2）
 			while (ite.hasNext()) {
 				JsonNode j = ite.next();
