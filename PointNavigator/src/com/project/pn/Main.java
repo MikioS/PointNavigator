@@ -1,14 +1,23 @@
 package com.project.pn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+
+
+
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,6 +50,20 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 
 	// 地図の中心位置
 	private CameraPosition centerPosition = null;
+	
+	//ポイントカードの種類
+    static  boolean[] point_selected  = null;
+    //ポイントカードのダイアログ
+    AlertDialog.Builder point_dialog;
+    //選択したポイントカード
+    static  String[] point_Disp  = null;
+    
+	//お店の種類
+    static  boolean[] store_selected  = null;
+    //お店のダイアログ
+    AlertDialog.Builder store_dialog;
+    //選択したお店
+    static  String[] store_Disp  = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +126,84 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 		}
 		// GoogleMapが使用できないとき
 		catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		//登録されているポイントカードの読み込み
+        ArrayList<String> poitDispList = new ArrayList<String>();
+        poitDispList.add("Ponta");
+        poitDispList.add("Tカード");
+        poitDispList.add("nanaco");
+        poitDispList.add("楽天カード");
+        point_Disp = (String[])poitDispList.toArray(new String[poitDispList.size()]);
+        point_selected = new boolean[point_Disp.length];
+        for (int j = 0;j < point_selected.length;j ++) {
+        	point_selected[j] = false;
+        }
+        
+		//登録されているお店の読み込み
+        ArrayList<String> storeDispList = new ArrayList<String>();
+        storeDispList.add("コンビニ");
+        storeDispList.add("飲食店");
+        storeDispList.add("家電");
+        storeDispList.add("ガソリンスタンド");
+        store_Disp = (String[])storeDispList.toArray(new String[storeDispList.size()]);
+        store_selected = new boolean[store_Disp.length];
+        for (int j = 0;j < store_selected.length;j ++) {
+        	store_selected[j] = false;
+        }
+		
+		
+		/*
+		 * ボタン関係の処理
+		 */
+        //お店の種類を登録するボタン
+        ((Button)findViewById(R.id.store)).setOnClickListener(
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final boolean[] tmp_store_selected;
+                        tmp_store_selected = store_selected.clone();
+                        store_dialog = new AlertDialog.Builder(Main.this);
+                        store_dialog.setTitle("お店の種類選択");
+                        store_dialog.setMultiChoiceItems(
+                                store_Disp,
+                                store_selected,
+                                new DialogInterface.OnMultiChoiceClickListener(){
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                            	tmp_store_selected[which] = isChecked;
+                            }});
+                        store_dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            //とりあえず、何もしない
+                            }});
+                        store_dialog.show();
+                    }});
+        //ポイントカードを選択するボタン
+		  ((Button)findViewById(R.id.point)).setOnClickListener(
+	                new OnClickListener() {
+	                    @Override
+	                    public void onClick(View v) {
+	                        final boolean[] tmp_days_selected;
+	                        tmp_days_selected = point_selected.clone();
+	                        point_dialog = new AlertDialog.Builder(Main.this);
+	                        point_dialog.setTitle("ポイントカード選択");
+	                        point_dialog.setMultiChoiceItems(
+	                                point_Disp,
+	                                point_selected,
+	                                new DialogInterface.OnMultiChoiceClickListener(){
+	                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+	                                tmp_days_selected[which] = isChecked;
+	                            }});
+	                        point_dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	                            public void onClick(DialogInterface dialog, int id) {
+	                            //とりあえず、何もしない
+	                            }});
+	                        point_dialog.show();
+	                    }});
+		
+		
+		
 	}
 
 	// 2点間の距離を求める(km)
@@ -129,9 +229,9 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 		// 現在位置ボタンの表示（2）
 		googleMap.setMyLocationEnabled(true);
 
-		// 東京駅の位置、ズーム設定（3）
+		//渋谷駅の位置、ズーム設定（3）
 		CameraPosition camerapos = new CameraPosition.Builder()
-				.target(new LatLng(35.681382, 139.766084)).zoom(15.5f).build();
+				.target(new LatLng(35.659301,139.698087)).zoom(15.5f).build();
 		// 地図の中心を変更する（4）
 		googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(camerapos));
 
@@ -189,7 +289,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 
 	@Override
 	public void onLoadFinished(Loader<String> loader, String body) {
-		body = "{\"response\":{\"store\":[{\"x\":139.766709,\"y\":35.681247,\"pointNames\":\"Ponta\",\"name\":\"ローソン上野店\"}]}}";
+		body = "{\"response\":{\"store\":[{\"x\":139.698087,\"y\":35.659301,\"pointNames\":\"Ponta\",\"name\":\"ローソン上野店\"}]}}";
 		// APIの取得に失敗の場合
 		if (body == null)
 			return;
