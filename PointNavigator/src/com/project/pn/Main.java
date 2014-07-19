@@ -1,6 +1,11 @@
 package com.project.pn;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import java.util.ArrayList;
+
 import java.util.HashMap;
 
 
@@ -11,6 +16,7 @@ import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.DialogInterface;
 import android.content.Loader;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -194,6 +200,8 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 	                                new DialogInterface.OnMultiChoiceClickListener(){
 	                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 	                                tmp_days_selected[which] = isChecked;
+	                                //TODO チェックのついていないものは、マーカーを削除して、チェックのついたものはマーカーを復元する
+	                                
 	                            }});
 	                        point_dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 	                            public void onClick(DialogInterface dialog, int id) {
@@ -289,7 +297,29 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 
 	@Override
 	public void onLoadFinished(Loader<String> loader, String body) {
-		body = "{\"response\":{\"store\":[{\"x\":139.698087,\"y\":35.659301,\"pointNames\":\"Ponta\",\"name\":\"ローソン上野店\"}]}}";
+//		body = "{\"response\":{\"store\":[{\"x\":139.698087,\"y\":35.659301,\"pointNames\":\"Ponta\",\"name\":\"ローソン上野店\"}]}}";
+		
+		//とりあえずファイルから読込みを行う
+		Resources res = this.getResources();  
+		InputStream is = res.openRawResource(R.raw.datalist);
+        
+		try {
+			InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+			BufferedReader br = new BufferedReader(isr);
+			StringBuilder linebff = new StringBuilder();
+			linebff.append("{\"response\":{");
+			linebff.append("\"store\":[");
+			String line;
+	        while ((line = br.readLine()) != null) {
+	        	linebff.append(line);
+	        }
+	        linebff.append("]}}");
+	        body = linebff.toString();
+		} catch (Exception e) {
+			
+		}
+
+		
 		// APIの取得に失敗の場合
 		if (body == null)
 			return;
@@ -305,7 +335,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 			// マーカーをいったん削除しておく
 			googleMap.clear();
 			pointMarkerMap.clear();
-			
+
 			// APIの結果をマーカーに反映する（2）
 			for (StoreInfo e : parse.getStoreInfo()) {
 
@@ -314,7 +344,7 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 						.title(e.name)
 						.snippet(e.pointNames)
 						.icon(BitmapDescriptorFactory
-								.fromResource(R.drawable.ic_pin))); //(3)
+								.fromResource(getPin(e.pointNames)))); //(3)
 
 				// マーカーと駅情報を保管しておく（4）
 				pointMarkerMap.put(marker, e);
@@ -329,4 +359,19 @@ public class Main extends Activity implements LoaderCallbacks<String> {
 		// TODO 自動生成されたメソッド・スタブ
 	}
 
+	
+	public static int getPin(String pointName) {
+		if (pointName.equals("Ponta")) {
+			return R.drawable.pin_blue_c;
+		} else if (pointName.equals("Tカード")) {
+			return R.drawable.pin_green_c;
+		} else if (pointName.equals("nanaco")) {
+			return R.drawable.pin_magenta_c;
+		} else if (pointName.equals("楽天カード")) {
+			return R.drawable.pin_red_c;
+		} else {
+			return R.drawable.pin_yellow_c;
+		}
+		
+	}
 }

@@ -37,6 +37,9 @@ public class ParseStoreInfo extends ParseJson {
 				e.name = j.path("name").asText();
 				String pointNames = j.path("pointNames").asText();
 				e.pointNames = pointNames;
+				
+				String genre = j.path("genre").asText();
+				e.genre = genre;
 
 				storeInfoList.add(e);
 			}
