@@ -208,6 +208,7 @@ containing a value of this type.
     }
     public static final class raw {
         public static final int datalist=0x7f040000;
+        public static final int list=0x7f040001;
     }
     public static final class string {
         public static final int action_moyori=0x7f070018;
